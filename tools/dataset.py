@@ -31,7 +31,7 @@ class CustomDataset(Dataset):
         
         img = self.preprocess(img)
         if self.split == "train":
-            position=self.transforms(position)
+            img=self.transforms(img)
             
         # Convert mask and pos_embed to tensor
         img = self.img_transforms(img)

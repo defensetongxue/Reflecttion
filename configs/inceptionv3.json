@@ -1,8 +1,8 @@
 {
     "num_works": 12,
-    "save_name":"vit.pth",
+    "save_name":"inceptionv3.pth",
     "model": {
-        "name": "vit_b_16",
+        "name": "inceptionv3",
         "loss_func":"CrossEntropyLoss",
         "num_classes": 2,
         "official_model_save": "./experiments"

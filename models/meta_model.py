@@ -3,6 +3,12 @@ import os
 import torch.nn as nn
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters())
+def build_vit_b_16(config):
+    os.environ['TORCH_HOME'] = config["official_model_save"]
+    model = models.vit_b_16(pretrained=True)
+    model.heads = nn.Linear(768, config["num_classes"])
+
+    return model
 def build_inceptionv3(config):
     os.environ['TORCH_HOME']=config["official_model_save"]
     model=models.inception_v3(pretrained=True)
@@ -49,6 +55,8 @@ def build_efficientnet_b7(config):
     model.classifier[1]=nn.Linear(in_features=2560, out_features=config['num_classes'], bias=True)
     print(f"efficentnet b7 has {count_parameters(model)}")
     # return model
+    
+
 if __name__ =='__main__':
     cfg={
         "official_model_save":"./experiments",

@@ -2,7 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 from tools.dataset import CustomDataset
 from  models import build_model
-import os
+import os,json
 from tools.functions import train_epoch,val_epoch,get_optimizer,lr_sche
 from configs import get_config
 # Initialize the folder
@@ -87,3 +87,12 @@ model.load_state_dict(
     torch.load(os.path.join(args.save_dir, args.configs['save_name'])))
 test_loss, accuracy, auc = val_epoch(model, test_loader, criterion, device)
 print("best epoch model: Acc: {:.2f} | Auc: {:.2f}".format(accuracy,auc))
+
+with open('./record.json','r') as f:
+    record=json.load(f)
+record[args.configs['model']['name']]={
+    "acc":"{:.2f}".format(accuracy),
+    "auc":"{:.2f}".format(auc)
+}
+with open('./record.json','w') as f:
+    json.dump(record,f)

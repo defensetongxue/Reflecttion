@@ -15,7 +15,7 @@ def train_epoch(model, optimizer, train_loader, loss_function, device,lr_schedul
     model.train()
     running_loss = 0.0
     batch_length=len(train_loader)
-    for data_iter_step,(inputs, targets, meta) in enumerate(train_loader):
+    for data_iter_step,(inputs, targets) in enumerate(train_loader):
         # Moving inputs and targets to the correct device
         lr_scheduler.adjust_learning_rate(optimizer,epoch+(data_iter_step/batch_length))
         inputs = to_device(inputs, device)
@@ -43,7 +43,7 @@ def val_epoch(model, val_loader, loss_function, device):
     probs_list = []
 
     with torch.no_grad():
-        for inputs, targets, _ in val_loader:
+        for inputs, targets in val_loader:
             inputs = to_device(inputs, device)
             targets = to_device(targets, device)
 

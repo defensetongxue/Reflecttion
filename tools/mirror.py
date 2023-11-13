@@ -52,5 +52,3 @@ def mirror(image_path, save_path):
     # Save the image
     img.save(save_path)
 
-# Example usage
-mirror('mutianyu.jpg', 'res.jpg', 'horizontal')
