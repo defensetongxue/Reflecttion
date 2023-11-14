@@ -1,54 +1,43 @@
-from PIL import Image
+from PIL import Image, ImageFilter
 import numpy as np
 import random
+
 def mirror(image_path, save_path):
-    # Open and resize the image
+    # Load and resize the image
     img = Image.open(image_path)
     img = img.resize((224, 224))
 
-    # Determine the axis coordinate
-    mean = 112
-    std = 40
-    x = max(56, min(int(np.random.normal(mean, std)), 168))  # Ensure x is within bounds
+    # Determine the starting point of the crop
+    mean_begin = 65
+    std_begin = 15
+    begin = max(30, min(int(np.random.normal(mean_begin, std_begin)), 90))
 
-    if random.random()<0.5:
-        # Determine which part is larger and set up the boundaries for cropping and flipping
-        if x < 112:
-            # The right side is larger, flip it over the left
-            start = x
-            end = 224
-            mirrored_end = 224 - x
-        else:
-            # The left side is larger, flip it over the right
-            start = 0
-            end = x
-            mirrored_end = x
+    # Determine the length of the crop
+    length = random.randint(113, 133)
 
-        for i in range(start, end):
-            for j in range(224):
-                mirrored_i = 2 * x - i
-                if 0 <= mirrored_i < 224:  # Ensure the mirrored index is within bounds
-                    img.putpixel((mirrored_i, j), img.getpixel((i, j)))
+    # Ensure the crop does not exceed image bounds
+    end = min(begin + length, 224)
 
-    else:
-        # Horizontal flipping
-        if x < 112:
-            # The bottom part is larger, flip it over the top
-            start = x
-            end = 224
-            mirrored_end = 224 - x
-        else:
-            # The top part is larger, flip it over the bottom
-            start = 0
-            end = x
-            mirrored_end = x
+    # Crop the middle section of the image
+    middle_part = img.crop((0, begin, 224, end))
 
-        for i in range(224):
-            for j in range(start, end):
-                mirrored_j = 2 * x - j
-                if 0 <= mirrored_j < 224:  # Ensure the mirrored index is within bounds
-                    img.putpixel((i, mirrored_j), img.getpixel((i, j)))
+    # Copy and flip the cropped part
+    flipped_part = middle_part.transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 
-    # Save the image
-    img.save(save_path)
+    # Apply Gaussian blur to the flipped part
+    guass_norm=random.randint(0, 2)
+    blurred_part = flipped_part.filter(ImageFilter.GaussianBlur(radius=guass_norm))
 
+    # Concatenate the original cropped part, the flipped blurred part, and the remaining part
+    final_img = Image.new('RGB', (224, 224))
+    final_img.paste(middle_part, (0, 0))
+    final_img.paste(blurred_part, (0, middle_part.height))
+
+    # Calculate remaining space and fill it
+    remaining_space = 224 - (middle_part.height + blurred_part.height)
+    if remaining_space > 0:
+        additional_part = middle_part.crop((0, 0, 224, remaining_space))
+        final_img.paste(additional_part, (0, middle_part.height + blurred_part.height))
+
+    # Save the final image
+    final_img.save(save_path)
